@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:latest
+    container_name: mysql-gowt
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password_here
+      MYSQL_DATABASE: gowtdb
+      MYSQL_USER: gowt
+      MYSQL_PASSWORD: super_secret_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./scripts/scripts.sql:/docker-entrypoint-initdb.d/scripts.sql
