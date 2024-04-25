@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-db-sts
+  labels:
+    app: db
+spec:
+  serviceName: mysql-db-sts
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: mysql-db-container
+          image: mysql-db:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3306
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 1
+          readinessProbe:
+            exec:
+              command:
+                [
+                  "mysql",
+                  "-uroot",
+                  "-proot",
+                  "-e",
+                  "use gowtdb; select count(*) from tools",
+                ]
+            initialDelaySeconds: 25
+            periodSeconds: 10
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: mysql-pv
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-pv
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
