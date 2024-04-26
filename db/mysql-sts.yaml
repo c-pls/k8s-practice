@@ -32,13 +32,11 @@ spec:
           readinessProbe:
             exec:
               command:
-                [
-                  "mysql",
-                  "-uroot",
-                  "-proot",
-                  "-e",
-                  "use gowtdb; select count(*) from tools",
-                ]
+                - mysql
+                - '-uroot'
+                - '-proot'
+                - '-e'
+                - use gowtdb; select count(*) from tools
             initialDelaySeconds: 25
             periodSeconds: 10
             timeoutSeconds: 1
@@ -49,7 +47,8 @@ spec:
     - metadata:
         name: mysql-pv
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes:
+          - ReadWriteOnce
         resources:
           requests:
             storage: 5Gi
